@@ -307,6 +307,44 @@ public extension IQKeyboardManager {
             var lastView: UIView = textFieldView
             var superScrollView: UIScrollView? = lastScrollViewConfiguration.scrollView
 
+            // Updating contentInset
+            let lastScrollView = lastScrollViewConfiguration.scrollView
+            if let lastScrollViewRect: CGRect = lastScrollView.superview?.convert(lastScrollView.frame, to: window),
+                !lastScrollView.iq.ignoreContentInsetAdjustment {
+
+                var bottomInset: CGFloat = (kbSize.height)-(window.frame.height-lastScrollViewRect.maxY)
+                let keyboardAndSafeArea: CGFloat = keyboardDistance + rootConfiguration.beginSafeAreaInsets.bottom
+                var bottomScrollIndicatorInset: CGFloat = bottomInset - keyboardAndSafeArea
+
+                // Update the insets so that the scrollView doesn't shift incorrectly
+                // when the offset is near the bottom of the scroll view.
+                bottomInset = CGFloat.maximum(lastScrollViewConfiguration.startingContentInset.bottom, bottomInset)
+                let startingScrollInset: UIEdgeInsets = lastScrollViewConfiguration.startingScrollIndicatorInsets
+                bottomScrollIndicatorInset = CGFloat.maximum(startingScrollInset.bottom,
+                                                             bottomScrollIndicatorInset)
+
+                bottomInset -= lastScrollView.safeAreaInsets.bottom
+                bottomScrollIndicatorInset -= lastScrollView.safeAreaInsets.bottom
+
+                var movedInsets: UIEdgeInsets = lastScrollView.contentInset
+                movedInsets.bottom = bottomInset
+
+                if lastScrollView.contentInset != movedInsets {
+                    showLog("old ContentInset: \(lastScrollView.contentInset) new ContentInset: \(movedInsets)")
+
+                    activeConfiguration.animate(alongsideTransition: {
+                        lastScrollView.contentInset = movedInsets
+                        lastScrollView.layoutIfNeeded() // (Bug ID: #1996)
+
+                        var newScrollIndicatorInset: UIEdgeInsets = lastScrollView.verticalScrollIndicatorInsets
+
+                        newScrollIndicatorInset.bottom = bottomScrollIndicatorInset
+                        lastScrollView.scrollIndicatorInsets = newScrollIndicatorInset
+                    })
+                }
+            }
+
+            // ScrollView scrolling
             while let scrollView: UIScrollView = superScrollView {
 
                 var isContinue: Bool = false
@@ -469,43 +507,6 @@ public extension IQKeyboardManager {
                 } else {
                     moveUp = 0
                     break
-                }
-            }
-
-            // Updating contentInset
-            let lastScrollView = lastScrollViewConfiguration.scrollView
-            if let lastScrollViewRect: CGRect = lastScrollView.superview?.convert(lastScrollView.frame, to: window),
-                !lastScrollView.iq.ignoreContentInsetAdjustment {
-
-                var bottomInset: CGFloat = (kbSize.height)-(window.frame.height-lastScrollViewRect.maxY)
-                let keyboardAndSafeArea: CGFloat = keyboardDistance + rootConfiguration.beginSafeAreaInsets.bottom
-                var bottomScrollIndicatorInset: CGFloat = bottomInset - keyboardAndSafeArea
-
-                // Update the insets so that the scrollView doesn't shift incorrectly
-                // when the offset is near the bottom of the scroll view.
-                bottomInset = CGFloat.maximum(lastScrollViewConfiguration.startingContentInset.bottom, bottomInset)
-                let startingScrollInset: UIEdgeInsets = lastScrollViewConfiguration.startingScrollIndicatorInsets
-                bottomScrollIndicatorInset = CGFloat.maximum(startingScrollInset.bottom,
-                                                             bottomScrollIndicatorInset)
-
-                bottomInset -= lastScrollView.safeAreaInsets.bottom
-                bottomScrollIndicatorInset -= lastScrollView.safeAreaInsets.bottom
-
-                var movedInsets: UIEdgeInsets = lastScrollView.contentInset
-                movedInsets.bottom = bottomInset
-
-                if lastScrollView.contentInset != movedInsets {
-                    showLog("old ContentInset: \(lastScrollView.contentInset) new ContentInset: \(movedInsets)")
-
-                    activeConfiguration.animate(alongsideTransition: {
-                        lastScrollView.contentInset = movedInsets
-                        lastScrollView.layoutIfNeeded() // (Bug ID: #1996)
-
-                        var newScrollIndicatorInset: UIEdgeInsets = lastScrollView.verticalScrollIndicatorInsets
-
-                        newScrollIndicatorInset.bottom = bottomScrollIndicatorInset
-                        lastScrollView.scrollIndicatorInsets = newScrollIndicatorInset
-                    })
                 }
             }
         }
