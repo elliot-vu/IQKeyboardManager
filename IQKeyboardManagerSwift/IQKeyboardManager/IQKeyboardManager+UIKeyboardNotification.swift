@@ -49,7 +49,9 @@ internal extension IQKeyboardManager {
         if !privateIsEnabled() {
             restorePosition()
         } else {
-            adjustPosition()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.adjustPosition()
+            }
         }
     }
 
@@ -60,7 +62,9 @@ internal extension IQKeyboardManager {
         if !privateIsEnabled() {
             restorePosition()
         } else {
-            adjustPosition()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.adjustPosition()
+            }
         }
     }
 

@@ -121,16 +121,15 @@ public struct IQKeyboardInfo: Equatable {
 //            animator.isUserInteractionEnabled = true
 //            animator.startAnimation()
 //        } else {
-//        var animationOptions: UIView.AnimationOptions = .init(rawValue: UInt(animationCurve.rawValue << 16))
-//        animationOptions.formUnion(.allowUserInteraction)
-//        animationOptions.formUnion(.beginFromCurrentState)
-//        UIView.animate(withDuration: animationDuration, delay: 0,
-//                       options: animationOptions,
-//                       animations: transition,
-//                       completion: { _ in
-        transition()
+        var animationOptions: UIView.AnimationOptions = .init(rawValue: UInt(animationCurve.rawValue << 16))
+        animationOptions.formUnion(.allowUserInteraction)
+        animationOptions.formUnion(.beginFromCurrentState)
+        UIView.animate(withDuration: animationDuration, delay: 0,
+                       options: animationOptions,
+                       animations: transition,
+                       completion: { _ in
             completion?()
-//        })
+        })
 //        }
     }
 }
