@@ -307,6 +307,7 @@ public extension IQKeyboardManager {
             var lastView: UIView = textFieldView
             var superScrollView: UIScrollView? = lastScrollViewConfiguration.scrollView
 
+            showLog("Start update content inset")
             // Updating contentInset
             let lastScrollView = lastScrollViewConfiguration.scrollView
             if let lastScrollViewRect: CGRect = lastScrollView.superview?.convert(lastScrollView.frame, to: window),
@@ -344,6 +345,8 @@ public extension IQKeyboardManager {
                 }
             }
 
+            showLog("Stop update content inset")
+            showLog("Start scroll")
             // ScrollView scrolling
             while let scrollView: UIScrollView = superScrollView {
 
